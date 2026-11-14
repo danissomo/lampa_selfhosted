@@ -78,9 +78,13 @@ services:
     image: linuxserver/jackett:latest
     container_name: lampa-jackett
     restart: unless-stopped
+    ports:
+       - "9997:9117"
     depends_on:
       jackett-init:
         condition: service_completed_successfully
+      flaresolverr:
+        condition: service_started
     environment:
       - PUID=1000
       - PGID=1000
@@ -106,3 +110,22 @@ services:
       echo "Indexers ready"
       '
     restart: "no"
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=Europe/Moscow # Укажите ваш часовой пояс
+    ports:
+      - "8191:8191"
+    restart: unless-stopped
+  jackett-rutracker-pinger:
+    image: curlimages/curl:latest
+    depends_on:
+      - jackett
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["/scripts/test_rutracker.sh"]
+    restart: unless-stopped

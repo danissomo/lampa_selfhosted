@@ -1,5 +1,32 @@
 # Lampa Self-Hosted
 
+## MOD
+
+### Удалена авторизация
+Удалить файл `source/web/custom_plugins/auth.js`
+### Удален прокси подмены ключа Jackett
+Удален файл `source/web/custom_plugins/jackett_proxy.js`
+Переписан файл для пускания трафика напрямую
+```nginx
+...
+location /jackett/ {
+	proxy_pass http://jackett:9117/;
+	proxy_set_header Host $http_host;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_read_timeout 60;
+	proxy_send_timeout 60;
+}
+...
+```
+API ключ (`"APIKey": "auto"`) задан `auto` в `data/jackett/config/Jackett/ServerConfig.json`
+
+### Добавлен сервис опроса jacket
+
+[test_rutracker](scripts/test_rutracker.sh)
+
+---
+
 🎬 Полностью самостоятельная версия [Lampa](https://github.com/yumata/lampa) - медиацентра с синхронизацией и Telegram-интеграцией.
 
 ## 🌟 Особенности
